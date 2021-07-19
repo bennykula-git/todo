@@ -1,0 +1,26 @@
+.todo {
+  width: 60%;
+  background-color: rgb(50, 38, 61);
+  border-radius: 9px;
+  margin: auto;
+  margin-top: 30px;
+  padding-bottom: 1px;
+}
+
+.todo h2 {
+  color: aliceblue;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 15px;
+  font-size: 40px;
+}
+
+@media (max-width: 600px) {
+  .todo {
+    width: 100%;
+    height: 100%;
+  }
+  .todo h2 {
+    font-size: 25px;
+  }
+}
