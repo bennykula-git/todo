@@ -1,6 +1,6 @@
 import React, { useReducer, useEffect } from 'react';
 
-const server = ' http://192.168.1.28:8080';
+const server = 'http://localhost:8080';
 
 const TodoCtx = React.createContext({
   tasks: [],
