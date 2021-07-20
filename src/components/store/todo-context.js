@@ -1,6 +1,8 @@
 import React, { useReducer, useEffect } from 'react';
 
-const server = 'http://localhost:8080';
+const server =
+  'https://todo-f50bc-default-rtdb.europe-west1.firebasedatabase.app/todo';
+const end = '.json';
 
 const TodoCtx = React.createContext({
   tasks: [],
@@ -14,27 +16,33 @@ const initState = {
   tasks: [],
 };
 
+const sortTasks = (a, b) => {
+  if (a.date > b.date) {
+    return 1;
+  }
+  if (b.date > a.date) {
+    return -1;
+  }
+  if (a.time > b.time) {
+    return 1;
+  }
+  if (b.time > a.time) {
+    return -1;
+  }
+  return 0;
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'FETCH':
+      if (action.tasks === null) {
+        return initState;
+      }
+      action.tasks.sort(sortTasks);
       return { tasks: action.tasks };
     case 'ADD':
       const newStasks = [action.task, ...state.tasks];
-      newStasks.sort((a, b) => {
-        if (a.date > b.date) {
-          return 1;
-        }
-        if (b.date > a.date) {
-          return -1;
-        }
-        if (a.time > b.time) {
-          return 1;
-        }
-        if (b.time > a.time) {
-          return -1;
-        }
-        return 0;
-      });
+      newStasks.sort(sortTasks);
       return { tasks: newStasks };
     case 'DELETE':
       return { tasks: state.tasks.filter((task) => task.id !== action.id) };
@@ -60,7 +68,7 @@ export const TodoCtxProvider = (props) => {
 
   const sendToServerAndSave = async (newTask) => {
     try {
-      const response = await fetch(server + '/api', {
+      const response = await fetch(server + end, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newTask),
@@ -69,7 +77,7 @@ export const TodoCtxProvider = (props) => {
         throw new Error('Unable to add new task');
       }
       const id = await response.json();
-      newTask.id = id;
+      newTask.id = id.name;
       dispatch({ type: 'ADD', task: newTask });
     } catch (error) {
       alert(error.message);
@@ -78,7 +86,7 @@ export const TodoCtxProvider = (props) => {
 
   const deleteFromServer = async (id) => {
     try {
-      const respnse = await fetch(server + '/api/' + id, {
+      const respnse = await fetch(server + '/' + id + end, {
         method: 'DELETE',
       });
       if (!respnse.ok) {
@@ -91,11 +99,20 @@ export const TodoCtxProvider = (props) => {
 
   const fetchFromServer = async () => {
     try {
-      const response = await fetch(server + '/api');
+      const response = await fetch(server + end);
       if (!response.ok) {
         throw new Error('unable to fetch');
       }
-      const tasks = await response.json();
+      const responseTasks = await response.json();
+      const tasks = [];
+      for (const key in responseTasks) {
+        tasks.push({
+          id: key,
+          content: responseTasks[key].content,
+          date: responseTasks[key].date,
+          time: responseTasks[key].time,
+        });
+      }
       dispatch({ type: 'FETCH', tasks: tasks });
     } catch (error) {
       alert(error.message);
