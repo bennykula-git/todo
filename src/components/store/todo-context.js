@@ -41,9 +41,9 @@ const reducer = (state, action) => {
       action.tasks.sort(sortTasks);
       return { tasks: action.tasks };
     case 'ADD':
-      const newStasks = [action.task, ...state.tasks];
-      newStasks.sort(sortTasks);
-      return { tasks: newStasks };
+      const newTasks = [action.task, ...state.tasks];
+      newTasks.sort(sortTasks);
+      return { tasks: newTasks };
     case 'DELETE':
       return { tasks: state.tasks.filter((task) => task.id !== action.id) };
     default:
